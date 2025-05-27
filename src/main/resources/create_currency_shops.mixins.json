@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "net.flaulox.create_currency_shops.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "refmap": "create_currency_shops.refmap.json",
+  "mixins": [
+    "StockTickerInteractionHandlerMixin"
+  ],
+  "client": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
