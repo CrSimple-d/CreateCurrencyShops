@@ -1,0 +1,10 @@
+{
+  "item.create_currency_shops.currency_item": "Coins",
+  "item.create_currency_shops.brass_coin": "Brass Coin",
+  "item.create_currency_shops.copper_coin": "Copper Coin",
+  "item.create_currency_shops.gold_coin": "Gold Coin",
+  "item.create_currency_shops.iron_coin": "Iron Coin",
+  "item.create_currency_shops.netherite_coin": "Netherite Coin",
+  "item.create_currency_shops.zinc_coin": "Zinc Coin",
+  "itemGroup.create_currency_shops.base": "Create: Currency Shops"
+}

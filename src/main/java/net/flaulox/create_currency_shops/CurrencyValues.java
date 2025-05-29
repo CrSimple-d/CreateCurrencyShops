@@ -1,38 +1,27 @@
 package net.flaulox.create_currency_shops;
 
-import com.simibubi.create.content.logistics.BigItemStack;
 import com.simibubi.create.content.logistics.packager.InventorySummary;
 import net.createmod.catnip.data.Pair;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class CurrencyValues {
-    public static final Map<Item, Integer> COIN_VALUES = Map.of(
-            Items.GOLD_INGOT, 10,
-            Items.IRON_INGOT, 5,
-            Items.COPPER_INGOT, 1
-    );
 
-    public static int getValue(InventorySummary paymentEntries) {
-        int result = 0;
-        for (BigItemStack stack : paymentEntries.getStacks()) {
-            result += COIN_VALUES.getOrDefault(stack.stack.getItem(), 0) * stack.count;
-        }
-        System.out.println(result);
-        return result;
-    }
+    public static final Map<Item, Integer> COIN_VALUES = Config.currencyValues;
+
+
+
 
     public static int getValue(ItemStack stack) {
         return COIN_VALUES.getOrDefault(stack.getItem(), -1);
     }
 
-    public static int countValueInInventory(Player player) {
-        Inventory inventory = player.getInventory();
+    public static int countValueInInventory(Inventory inventory) {
         int total = 0;
 
         for (int i = 0; i < inventory.getContainerSize(); i++) {
@@ -90,28 +79,52 @@ public class CurrencyValues {
     }
 
     //places Change directly into Players Inventory
-    public static void processChange(Inventory inventory, int amount) {
-        Item lowestDenomination = sortCoinValues().getFirst().getKey();
-        while (amount > 0) {
-            boolean changeAdded = false;
-            for (int i = 0; i < inventory.getContainerSize(); i++) {
-                ItemStack stack = inventory.getItem(i);
-                if (stack.getItem() == lowestDenomination && stack.getCount() < inventory.getMaxStackSize()) {
-                    stack.setCount(stack.getCount() + 1);
-                    changeAdded = true;
-                    amount--;
-                    break;
+    public static void processChange(Player player, int totalAmount) {
+        Inventory inventory = player.getInventory();
+        List<Map.Entry<Item, Integer>> sortedCoinValues = sortCoinValues();
+//        Item lowestDenomination = sortedCoinValues.getFirst().getKey();
+        int index = sortedCoinValues.size() - 1;
+        while (totalAmount > 0 && index >= 0) {
+
+
+            int amount = totalAmount;
+            for (int i = 0; i < amount / sortedCoinValues.get(index).getValue(); i++) {
+                boolean changeAdded = false;
+                for (int j = 0; j < inventory.getContainerSize(); j++) {
+                    ItemStack stack = inventory.getItem(j);
+                    if (stack.getItem() == sortedCoinValues.get(index).getKey() && stack.getCount() < stack.getMaxStackSize()) {
+                        stack.setCount(stack.getCount() + 1);
+                        changeAdded = true;
+                        totalAmount -= sortedCoinValues.get(index).getValue();
+                        break;
+                    }
+                }
+                if (!changeAdded) {
+                    if (!inventory.add(new ItemStack(sortedCoinValues.get(index).getKey()))) {
+                        if (!player.level().isClientSide) {
+                            player.level().addFreshEntity(new ItemEntity(
+                                    player.level(),
+                                    player.getX(),
+                                    player.getY() + 1,
+                                    player.getZ(),
+                                    new ItemStack(sortedCoinValues.get(index).getKey())
+                            ));
+                        }
+                    }
+                    totalAmount -= sortedCoinValues.get(index).getValue();
                 }
             }
-            if (!changeAdded) {
-                inventory.add(new ItemStack(lowestDenomination));
-                amount--;
-            }
+
+
+            index--;
+
         }
     }
 
-    public static boolean removeStackFromPaymentEntries(BigItemStack stack) {
-        return COIN_VALUES.containsKey(stack.stack.getItem());
+
+
+    public static boolean isValidCurrency(ItemStack stack) {
+        return COIN_VALUES.containsKey(stack.getItem());
     }
 
 
