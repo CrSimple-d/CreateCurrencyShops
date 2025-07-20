@@ -1,0 +1,10 @@
+{
+  "item.create_currency_shops.currency_item": "Монеты",
+  "item.create_currency_shops.brass_coin": "Латунная монета",
+  "item.create_currency_shops.copper_coin": "Медная монета",
+  "item.create_currency_shops.gold_coin": "Золотая монета",
+  "item.create_currency_shops.iron_coin": "Железная Coin",
+  "item.create_currency_shops.netherite_coin": "Незер монета",
+  "item.create_currency_shops.zinc_coin": "Цинковая монета",
+  "itemGroup.create_currency_shops.base": "Create: Валюты"
+}

@@ -18,7 +18,7 @@ public class TooltipHandler {
         Integer value = Config.currencyValues.get(item);
 
         if (value != null) {
-            event.getToolTip().add(Component.literal("§7Value: §e" + value));
+            event.getToolTip().add(Component.literal("§7Номинал: §e" + value));
         }
     }
 
