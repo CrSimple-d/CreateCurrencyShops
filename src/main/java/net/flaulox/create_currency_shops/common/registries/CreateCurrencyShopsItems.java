@@ -1,8 +1,9 @@
-package net.flaulox.create_currency_shops;
+package net.flaulox.create_currency_shops.common.registries;
 
 import com.tterrag.registrate.util.entry.ItemEntry;
-import net.flaulox.create_currency_shops.items.CoinItem;
-import net.flaulox.create_currency_shops.items.CurrencyItem;
+import net.flaulox.create_currency_shops.CreateCurrencyShops;
+import net.flaulox.create_currency_shops.common.items.CoinItem;
+import net.flaulox.create_currency_shops.common.items.CurrencyItem;
 
 public class CreateCurrencyShopsItems {
     private static final CreateCurrencyShopsRegistrate REGISTRATE = CreateCurrencyShops.registrate();

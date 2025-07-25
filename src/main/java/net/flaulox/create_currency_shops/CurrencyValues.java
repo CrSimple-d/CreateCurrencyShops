@@ -2,6 +2,7 @@ package net.flaulox.create_currency_shops;
 
 import com.simibubi.create.content.logistics.packager.InventorySummary;
 import net.createmod.catnip.data.Pair;
+import net.flaulox.create_currency_shops.config.Config;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -18,7 +19,7 @@ public class CurrencyValues {
 
 
     public static int getValue(ItemStack stack) {
-        return COIN_VALUES.getOrDefault(stack.getItem(), -1);
+        return COIN_VALUES.getOrDefault(stack.getItem(), 0);
     }
 
     public static int countValueInInventory(Inventory inventory) {

@@ -9,7 +9,7 @@ import com.simibubi.create.content.logistics.stockTicker.StockTickerInteractionH
 import com.simibubi.create.content.logistics.tableCloth.ShoppingListItem;
 import net.createmod.catnip.data.Couple;
 import net.createmod.catnip.data.Pair;
-import net.flaulox.create_currency_shops.CreateCurrencyShopsItems;
+import net.flaulox.create_currency_shops.common.registries.CreateCurrencyShopsItems;
 import net.flaulox.create_currency_shops.CurrencyValues;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;

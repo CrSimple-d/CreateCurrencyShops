@@ -5,10 +5,7 @@
   "compatibilityLevel": "JAVA_8",
   "refmap": "create_currency_shops.refmap.json",
   "mixins": [
-    "BlueprintOverlayRendererMixin",
-    "FilteringBehaviourAccessor",
-    "StockTickerInteractionHandlerMixin",
-    "TableClothFilteringBehaviourMixin"
+    "StockTickerInteractionHandlerMixin"
   ],
   "client": [
   ],

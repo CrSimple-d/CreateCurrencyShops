@@ -13,6 +13,8 @@ repositories {
     maven { url = "https://maven.createmod.net" } // Create, Ponder, Flywheel
     maven { url = "https://mvn.devos.one/snapshots" } // Registrate
     maven { url = "https://raw.githubusercontent.com/Fuzss/modresources/main/maven/" } // ForgeConfigAPIPort
+    maven { url = "https://api.modrinth.com/maven" } //Inventory Profiles Next
+    maven { url = 'https://thedarkcolour.github.io/KotlinForForge/' } //Kotlin For Forge
 
     maven {
         // location of the maven that hosts JEI files since January 2023
@@ -120,6 +122,11 @@ dependencies {
     compileOnly("dev.engine-room.flywheel:flywheel-neoforge-api-${minecraft_version}:${flywheel_version}")
     runtimeOnly("dev.engine-room.flywheel:flywheel-neoforge-${minecraft_version}:${flywheel_version}")
     implementation("com.tterrag.registrate:Registrate:${registrate_version}")
+
+    implementation("maven.modrinth:inventory-profiles-next:neoforge-${minecraft_version}-${ipn_version}")
+    implementation("maven.modrinth:libipn:neoforge-${minecraft_version}-${ipn_lib_version}")
+    implementation 'thedarkcolour:kotlinforforge-neoforge:5.9.0'
+
 
     compileOnly("mezz.jei:jei-${mc_version}-neoforge-api:${jei_version}")
 

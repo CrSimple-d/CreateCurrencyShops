@@ -3,8 +3,13 @@
   "item.create_currency_shops.brass_coin": "Латунная монета",
   "item.create_currency_shops.copper_coin": "Медная монета",
   "item.create_currency_shops.gold_coin": "Золотая монета",
-  "item.create_currency_shops.iron_coin": "Железная Coin",
+  "item.create_currency_shops.iron_coin": "Железная монета",
   "item.create_currency_shops.netherite_coin": "Незер монета",
   "item.create_currency_shops.zinc_coin": "Цинковая монета",
-  "itemGroup.create_currency_shops.base": "Create: Валюты"
+  "itemGroup.create_currency_shops.base": "Create: Валюты",
+  "item.create_currency_shops.exchanger": "Обменник валют",
+  "block.create_currency_shops.exchanger": "Обменник валют",
+  "block.create_currency_shops.exchanger.not_enough_space": "Недостаточно места",
+  "block.create_currency_shops.exchanger.gui_name": "Обменник",
+  "create_currency_shops.name_of_currency": "нокс"
 }

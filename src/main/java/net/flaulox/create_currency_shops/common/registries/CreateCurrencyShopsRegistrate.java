@@ -1,4 +1,4 @@
-package net.flaulox.create_currency_shops;
+package net.flaulox.create_currency_shops.common.registries;
 
 import com.simibubi.create.foundation.item.TooltipModifier;
 import com.tterrag.registrate.AbstractRegistrate;

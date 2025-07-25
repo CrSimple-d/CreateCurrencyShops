@@ -1,4 +1,4 @@
-package net.flaulox.create_currency_shops.items;
+package net.flaulox.create_currency_shops.common.items;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -17,8 +17,5 @@ public class CurrencyItem extends Item {
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
         tooltipComponents.add(Component.literal("This Item is a Placeholder and has no functionality. It is not supposed to be acquired in survival!").withStyle(ChatFormatting.GRAY));
-
-
-
     }
 }

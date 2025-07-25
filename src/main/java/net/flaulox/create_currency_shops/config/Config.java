@@ -1,5 +1,6 @@
-package net.flaulox.create_currency_shops;
+package net.flaulox.create_currency_shops.config;
 
+import net.flaulox.create_currency_shops.CreateCurrencyShops;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
@@ -13,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-@EventBusSubscriber(modid = CreateCurrencyShops.MODID, bus = EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(modid = CreateCurrencyShops.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
 public class Config {
     private static final ModConfigSpec.Builder BUILDER = new ModConfigSpec.Builder();
 
@@ -25,16 +26,16 @@ public class Config {
             BUILDER.comment("A list of Items and their values in the format 'modid:item=value'")
                     .defineListAllowEmpty("currencyValues",
                             List.of(
-                                    "create_currency_shops:iron_coin=5",
-                                    "create_currency_shops:zinc_coin=10",
-                                    "create_currency_shops:brass_coin=50",
-                                    "create_currency_shops:gold_coin=100",
-                                    "create_currency_shops:netherite_coin=500"
+                                    "create_currency_shops:iron_coin=10",
+                                    "create_currency_shops:zinc_coin=50",
+                                    "create_currency_shops:brass_coin=200",
+                                    "create_currency_shops:gold_coin=1000",
+                                    "create_currency_shops:netherite_coin=5000"
                             ),
                             Config::currencyValuesEntry
                     );
 
-    static final ModConfigSpec SPEC = BUILDER.build();
+    public static final ModConfigSpec SPEC = BUILDER.build();
 
     public static Map<Item, Integer> currencyValues;
 

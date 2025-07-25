@@ -6,5 +6,10 @@
   "item.create_currency_shops.iron_coin": "Iron Coin",
   "item.create_currency_shops.netherite_coin": "Netherite Coin",
   "item.create_currency_shops.zinc_coin": "Zinc Coin",
-  "itemGroup.create_currency_shops.base": "Create: Currency Shops"
+  "itemGroup.create_currency_shops.base": "Create: Currency Shops",
+  "item.create_currency_shops.exchanger": "Exchanger",
+  "block.create_currency_shops.exchanger": "Exchanger",
+  "block.create_currency_shops.exchanger.not_enough_space": "Not enough space",
+  "block.create_currency_shops.exchanger.gui_name": "Exchanger",
+  "create_currency_shops.name_of_currency": "nocs"
 }
