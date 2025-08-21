@@ -3,7 +3,6 @@ package net.flaulox.create_currency_shops.common.registries;
 import com.tterrag.registrate.util.entry.BlockEntry;
 import net.flaulox.create_currency_shops.CreateCurrencyShops;
 import net.flaulox.create_currency_shops.common.blocks.Exchanger;
-import net.minecraft.tags.BlockTags;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.block.SoundType;

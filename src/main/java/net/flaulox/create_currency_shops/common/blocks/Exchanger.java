@@ -82,7 +82,7 @@ public class Exchanger extends BaseEntityBlock {
     @Override
     protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
         if(!level.isClientSide) {
-            removeAll(level, pos, getRemovePositions(pos));
+            removeAll(level, pos, getRemovePositions(pos,state));
         }
         super.onRemove(state, level, pos, newState, movedByPiston);
     }
@@ -116,9 +116,14 @@ public class Exchanger extends BaseEntityBlock {
         }
     }
 
-    private List<BlockPos> getRemovePositions(BlockPos pos) {
-        List<BlockPos> blist = new ArrayList<>(Arrays.asList(getPositions(pos)));
-        blist.add(pos.offset(0,-1,0));
+    private List<BlockPos> getRemovePositions(BlockPos pos, BlockState state) {
+        List<BlockPos> blist = new ArrayList<>();
+        if(state.getValue(PART) == ExchangerParts.ADDITIONAL) {
+            blist.add(pos);
+            blist.add(pos.offset(0, -1, 0));
+        } else {
+            blist = List.of(getPositions(pos));
+        }
         return blist;
     }
 
@@ -133,6 +138,11 @@ public class Exchanger extends BaseEntityBlock {
             }
         }
         return false;
+    }
+
+    @Override
+    public boolean isFlammable(BlockState state, BlockGetter level, BlockPos pos, Direction direction) {
+        return true;
     }
 
     @Override

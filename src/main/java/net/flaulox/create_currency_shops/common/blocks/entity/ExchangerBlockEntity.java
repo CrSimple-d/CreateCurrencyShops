@@ -20,6 +20,7 @@ public class ExchangerBlockEntity extends BlockEntity implements MenuProvider {
     public ExchangerBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState blockState) {
         this(pos, blockState);
     }
+
     public ExchangerBlockEntity(BlockPos pos, BlockState blockState) {
         super(CreateCurrencyShopsBlockEntities.EXCHANGER.get(), pos, blockState);
     }

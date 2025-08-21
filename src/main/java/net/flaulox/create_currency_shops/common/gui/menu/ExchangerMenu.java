@@ -2,12 +2,14 @@ package net.flaulox.create_currency_shops.common.gui.menu;
 
 import net.flaulox.create_currency_shops.CurrencyValues;
 import net.flaulox.create_currency_shops.common.blocks.entity.ExchangerBlockEntity;
+import net.flaulox.create_currency_shops.common.gui.screen.ExchangerScreen;
 import net.flaulox.create_currency_shops.common.items.CoinItem;
 import net.flaulox.create_currency_shops.common.registries.CreateCurrencyShopsItems;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.core.NonNullList;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.Containers;
 import net.minecraft.world.SimpleContainer;
@@ -27,15 +29,19 @@ import static net.flaulox.create_currency_shops.common.registries.CreateCurrency
 import static net.flaulox.create_currency_shops.common.registries.CreateCurrencyShopsMenus.EXCHANGER_MENU;
 
 public class ExchangerMenu extends AbstractContainerMenu {
+    public static final int TOTAL_SIZE = 13;
+    public static final int RESULTS_SLOTS_COUNT = 6;
     public final ExchangerBlockEntity blockEntity;
     private final ItemStackHandler inventory;
+    private final Inventory pInv;
     private int guiYShift = 0;
+    private volatile boolean closingFlag;
 
     private final List<ExchangerResultSlot> outputSlots = new ArrayList<>();
     private final List<CoinInputSlot> inputSlots = new ArrayList<>();
 
     public ExchangerMenu(@Nullable MenuType<ExchangerMenu> exchangerMenuMenuType, int containerId, Inventory pInv, RegistryFriendlyByteBuf data) {
-        this(containerId,pInv,pInv.player.level().getBlockEntity(data.readBlockPos()), new ItemStackHandler(13) {
+        this(containerId,pInv,pInv.player.level().getBlockEntity(data.readBlockPos()), new ItemStackHandler(TOTAL_SIZE) {
             @Override
             protected int getStackLimit(int slot, ItemStack stack) {
                 return 99;
@@ -43,7 +49,7 @@ public class ExchangerMenu extends AbstractContainerMenu {
         });
     }
     public ExchangerMenu(int containerId, Inventory pInv, BlockEntity blockEntity) {
-        this(containerId,pInv,blockEntity, new ItemStackHandler(13) {
+        this(containerId,pInv,blockEntity, new ItemStackHandler(TOTAL_SIZE) {
             @Override
             protected int getStackLimit(int slot, ItemStack stack) {
                 return 99;
@@ -55,9 +61,11 @@ public class ExchangerMenu extends AbstractContainerMenu {
         super(EXCHANGER_MENU.get(), containerId);
         this.blockEntity = (ExchangerBlockEntity) blockEntity;
         this.inventory = inventory;
+        this.pInv = pInv;
+        this.closingFlag = false;
 
         if(pInv.player.level().isClientSide) {
-            this.guiYShift = (Minecraft.getInstance().options.guiScale().get() == 5 || Minecraft.getInstance().options.guiScale().get() == 0)?30:0;
+            this.guiYShift = (Minecraft.getInstance().options.guiScale().get() == 5 || Minecraft.getInstance().options.guiScale().get() == 0)?ExchangerScreen.BIGGER_GUY_Y_SHIFT :0;
         }
 
         this.addInventory(pInv);
@@ -65,13 +73,22 @@ public class ExchangerMenu extends AbstractContainerMenu {
         this.addMenuSlots();
     }
 
+    public void moveItemStackToHotbar(ItemStack stack, int slot) {
+        if (!moveItemStackTo(stack.copy(), slot, slot, false)) {
+            if (!moveItemStackTo(stack.copy(), 0, 9, false)) {
+                rawPutItems(pInv, stack.copy(), stack.getCount());
+            }
+        }
+    }
+
     @Override
     public void removed(Player player) {
+        closingFlag = true;
         super.removed(player);
         this.clearResultItems();
         this.putOrDropItems(this.getContainer(),player.getInventory());
     }
-    public void dropItems() {
+    public void rawDropItems() {
         SimpleContainer inv = this.getContainer();
         Containers.dropContents(this.blockEntity.getLevel(),this.blockEntity.getBlockPos(),inv);
     }
@@ -84,7 +101,7 @@ public class ExchangerMenu extends AbstractContainerMenu {
         return container;
     }
 
-    private void putOrDropItems(SimpleContainer container, Inventory pInv) {
+    public void putOrDropItems(SimpleContainer container, Inventory pInv) {
         if(hasFreeSlots(pInv,getOccupiedSlots(container))) {
             container.getItems().forEach(pInv::add);
         } else {
@@ -92,7 +109,7 @@ public class ExchangerMenu extends AbstractContainerMenu {
         }
     }
 
-    private int getOccupiedSlots(SimpleContainer container) {
+    public int getOccupiedSlots(SimpleContainer container) {
         int i = 0;
         for(int j = 0;j < container.getItems().size();j++) {
             if(container.getItem(i) != ItemStack.EMPTY) {
@@ -102,23 +119,23 @@ public class ExchangerMenu extends AbstractContainerMenu {
         return i;
     }
 
-    private void clearResultItems() {
+    public void clearResultItems() {
         outputSlots.forEach(s -> s.set(ItemStack.EMPTY));
     }
-    private void clearInputItems() {
+    public void clearInputItems() {
         inputSlots.forEach(s -> s.set(ItemStack.EMPTY));
     }
 
     private void addHotbar(Inventory pInv) {
         for (int i = 0; i<9; ++i) {
-            this.addSlot(new Slot(pInv,i,8+i*18,142+guiYShift));
+            this.addSlot(new Slot(pInv,i,8+i*18,142+guiYShift+ExchangerScreen.GENERAL_GUY_Y_SHIFT));
         }
     }
 
     private void addInventory(Inventory pInv) {
         for (int i = 0; i<3; ++i) {
             for (int j = 0; j<9; ++j) {
-                this.addSlot(new Slot(pInv,j+i*9+9,7+j*18,76+i*18+guiYShift));
+                this.addSlot(new Slot(pInv,j+i*9+9,7+j*18,76+i*18+guiYShift+ExchangerScreen.GENERAL_GUY_Y_SHIFT));
             }
         }
     }
@@ -161,15 +178,35 @@ public class ExchangerMenu extends AbstractContainerMenu {
     @Override
     public void clicked(int slotId, int button, ClickType clickType, Player player) {
         if(clickType == ClickType.QUICK_MOVE) {
-            if (this.slots.get(slotId) instanceof ExchangerResultSlot ers && this.slots.get(slotId).hasItem() && ers.mayPickup(player)) {
-                ItemStack stack = this.slots.get(slotId).getItem();
-                ItemStack copy = stack.copy();
-                this.placeToPlayerInventory(player.getInventory(),copy,getExchangeCount(stack));
-                this.clearInputAndGiveChange(getInputCost() - CurrencyValues.getValue(stack) * getExchangeCount(stack), player.getInventory());
-                return;
+            if (slotId >= 0 && slotId < this.slots.size()) {
+                if (this.slots.get(slotId) instanceof ExchangerResultSlot ers && ers.hasItem() && ers.mayPickup(player)) {
+                    exchange(this.slots.get(slotId).getItem(), player.getInventory());
+                    return;
+                }
             }
         }
         super.clicked(slotId, button, clickType, player);
+        if (slotId >= 0 && slotId < this.slots.size()) {
+            this.slots.get(slotId).setChanged();
+        }
+    }
+    private static void resetPhantomItems(Inventory inv,ItemStack stack) {
+        inv.items.stream()
+                .filter(i -> i.has(DataComponents.CUSTOM_DATA) && i.get(DataComponents.CUSTOM_DATA).contains("out") && ItemStack.isSameItem(i,stack))
+                .forEach(i -> {
+                    inv.setItem(inv.items.indexOf(i),ItemStack.EMPTY);
+                    inv.setItem(inv.items.indexOf(i), stack);
+                });
+    }
+
+    public void exchange(ItemStack source, Inventory inv) {
+        ItemStack copy = source.copy();
+        this.rawPutItems(inv,copy,getExchangeCount(source));
+        this.clearInputAndGiveChange(getChange(source), inv);
+    }
+
+    public int getChange(ItemStack source) {
+        return getInputCost() - CurrencyValues.getValue(source) * getExchangeCount(source);
     }
 
     @Override
@@ -181,7 +218,7 @@ public class ExchangerMenu extends AbstractContainerMenu {
         final int VANILLA_SLOT_COUNT = HOTBAR_SLOT_COUNT + PLAYER_INVENTORY_SLOT_COUNT;
         final int VANILLA_FIRST_SLOT_INDEX = 0;
         final int TE_INVENTORY_FIRST_SLOT_INDEX = VANILLA_FIRST_SLOT_INDEX + VANILLA_SLOT_COUNT;
-        final int TE_INVENTORY_SLOT_COUNT = 6;
+        final int TE_INVENTORY_SLOT_COUNT = RESULTS_SLOTS_COUNT;
 
         Slot sourceSlot = slots.get(pIndex);
         if (sourceSlot == null || !sourceSlot.hasItem())
@@ -217,23 +254,24 @@ public class ExchangerMenu extends AbstractContainerMenu {
     private void addMenuSlots() {
         int j = 0;
         for(int i = -5; i<=85; i+=18) {
-            this.inputSlots.add((CoinInputSlot)this.addSlot(new CoinInputSlot(this.inventory,j++,i,30+guiYShift)));
+            this.inputSlots.add((CoinInputSlot)this.addSlot(new CoinInputSlot(this.inventory,j++,i,30+guiYShift+ExchangerScreen.GENERAL_GUY_Y_SHIFT)));
         }
 
-        outputSlots.add((ExchangerResultSlot)this.addSlot(new ExchangerResultSlot(this.inventory,9,12,-2+guiYShift,
+        outputSlots.add((ExchangerResultSlot)this.addSlot(new ExchangerResultSlot(this.inventory,9,12,-2+guiYShift+ExchangerScreen.GENERAL_GUY_Y_SHIFT,
                 CreateCurrencyShopsItems.ZINC_COIN.asStack())));
-        outputSlots.add((ExchangerResultSlot)this.addSlot(new ExchangerResultSlot(this.inventory,8,12,-24+guiYShift,
+        outputSlots.add((ExchangerResultSlot)this.addSlot(new ExchangerResultSlot(this.inventory,8,12,-24+guiYShift+ExchangerScreen.GENERAL_GUY_Y_SHIFT,
                 CreateCurrencyShopsItems.IRON_COIN.asStack())));
-        outputSlots.add((ExchangerResultSlot)this.addSlot(new ExchangerResultSlot(this.inventory,7,12,-46+guiYShift,
+        outputSlots.add((ExchangerResultSlot)this.addSlot(new ExchangerResultSlot(this.inventory,7,12,-46+guiYShift+ExchangerScreen.GENERAL_GUY_Y_SHIFT,
                 CreateCurrencyShopsItems.COPPER_COIN.asStack())));
 
-        outputSlots.add((ExchangerResultSlot)this.addSlot(new ExchangerResultSlot(this.inventory,12,98,-2+guiYShift,
+        outputSlots.add((ExchangerResultSlot)this.addSlot(new ExchangerResultSlot(this.inventory,12,98,-2+guiYShift+ExchangerScreen.GENERAL_GUY_Y_SHIFT,
                 CreateCurrencyShopsItems.NETHERITE_COIN.asStack())));
-        outputSlots.add((ExchangerResultSlot)this.addSlot(new ExchangerResultSlot(this.inventory,11,98,-24+guiYShift,
+        outputSlots.add((ExchangerResultSlot)this.addSlot(new ExchangerResultSlot(this.inventory,11,98,-24+guiYShift+ExchangerScreen.GENERAL_GUY_Y_SHIFT,
                 CreateCurrencyShopsItems.GOLD_COIN.asStack())));
-        outputSlots.add((ExchangerResultSlot)this.addSlot(new ExchangerResultSlot(this.inventory,10,98,-46+guiYShift,
+        outputSlots.add((ExchangerResultSlot)this.addSlot(new ExchangerResultSlot(this.inventory,10,98,-46+guiYShift+ExchangerScreen.GENERAL_GUY_Y_SHIFT,
                 CreateCurrencyShopsItems.BRASS_COIN.asStack())));
     }
+
     public void drawCounts(GuiGraphics gui, Font font, int x, int y) {
         outputSlots.forEach(s -> s.drawCount(gui,font,x+40,y+5));
     }
@@ -254,19 +292,43 @@ public class ExchangerMenu extends AbstractContainerMenu {
             return stack.getItem() instanceof CoinItem;
         }
     }
-    class ExchangerResultSlot extends SlotItemHandler {
+    public class ExchangerResultSlot extends SlotItemHandler {
+
         private final ItemStack initItem;
 
         public ExchangerResultSlot(IItemHandler itemHandler, int index, int xPosition, int yPosition, ItemStack initItem) {
             super(itemHandler, index, xPosition, yPosition);
             this.initItem = initItem;
             if(!this.hasItem()) {
-                this.getItemHandler().insertItem(index, initItem, false);
+                this.initialize(initItem.copy());
             }
+
         }
 
         @Override
         public void setChanged() {
+            if(!checkItem(getItem()) && !closingFlag) {
+                this.reset();
+                return;
+            }
+            super.setChanged();
+        }
+
+        public void reset() {
+            this.set(ItemStack.EMPTY);
+            this.set(initItem.copy());
+        }
+
+        @Override
+        public void set(ItemStack stack) {
+            if(!checkItem(stack) && !closingFlag) {
+                return;
+            }
+            super.set(stack);
+        }
+
+        private boolean checkItem(ItemStack stack) {
+            return ItemStack.isSameItem(stack, initItem) && stack.getCount() == 1;
         }
 
         @Override
@@ -283,11 +345,11 @@ public class ExchangerMenu extends AbstractContainerMenu {
         public void onTake(Player player, ItemStack stack) {
             if(!player.level().isClientSide) {
                 if (getExchangeCount(stack) > stack.getMaxStackSize()) {
-                    placeToPlayerInventory(player.getInventory(), stack, getExchangeCount(stack));
+                    rawPutItems(player.getInventory(), stack, getExchangeCount(stack));
                 } else {
                     stack.setCount(getExchangeCount(stack));
                 }
-                clearInputAndGiveChange(getInputCost() - CurrencyValues.getValue(getItem()) * getExchangeCount(getItem()), player.getInventory());
+                clearInputAndGiveChange(getChange(getItem()), player.getInventory());
             }
         }
 
@@ -304,7 +366,7 @@ public class ExchangerMenu extends AbstractContainerMenu {
         }
     }
 
-    private boolean hasFreeSlots(Inventory pInv, int count) {
+    public boolean hasFreeSlots(Inventory pInv, int count) {
         int j = 0;
         for(int i = 0;i < pInv.items.size();i++) {
             if(j >= count) {
@@ -317,12 +379,12 @@ public class ExchangerMenu extends AbstractContainerMenu {
         return false;
     }
 
-    private void placeToPlayerInventory(Inventory pInv, ItemStack stack, int i) {
+    public void rawPutItems(Inventory pInv, ItemStack stack, int i) {
         stack.setCount(i);
         pInv.add(stack);
     }
 
-    void clearInputAndGiveChange(int change, Inventory pInv) {
+    public void clearInputAndGiveChange(int change, Inventory pInv) {
         final int NETHERITE = CurrencyValues.getValue(CreateCurrencyShopsItems.NETHERITE_COIN.asStack());
         final int GOLD = CurrencyValues.getValue(CreateCurrencyShopsItems.GOLD_COIN.asStack());
         final int BRASS = CurrencyValues.getValue(CreateCurrencyShopsItems.BRASS_COIN.asStack());

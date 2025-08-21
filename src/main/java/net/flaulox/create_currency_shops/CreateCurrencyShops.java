@@ -5,12 +5,8 @@ import com.simibubi.create.foundation.item.ItemDescription;
 import com.simibubi.create.foundation.item.KineticStats;
 import com.simibubi.create.foundation.item.TooltipModifier;
 import net.createmod.catnip.lang.FontHelper;
-import net.flaulox.create_currency_shops.common.gui.screen.ExchangerScreen;
 import net.flaulox.create_currency_shops.common.registries.*;
 import net.flaulox.create_currency_shops.config.Config;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceKey;
@@ -25,13 +21,10 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.neoforged.neoforge.client.event.ScreenEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
-
-import java.lang.reflect.Field;
 
 @Mod(CreateCurrencyShops.MOD_ID)
 public class CreateCurrencyShops {
@@ -63,11 +56,11 @@ public class CreateCurrencyShops {
         modContainer.registerConfig(ModConfig.Type.SERVER, Config.SPEC);
     }
 
-    private void commonSetup(final FMLCommonSetupEvent event) {
+    private void commonSetup(final FMLCommonSetupEvent e) {
     }
 
     @SubscribeEvent
-    public void onServerStarting(ServerStartingEvent event) {
+    public void onServerStarting(ServerStartingEvent e) {
 
     }
 
